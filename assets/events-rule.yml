@@ -1,0 +1,12 @@
+Resources:
+  StartCodeBuildOnGitTag:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: StartCodeBuildOnGitTag
+      Description: Starts CodeBuild project on Git tag pushes
+      EventPattern: {"detail-type": ["CodeCommit Repository State Change"], "source": ["aws.codecommit"], "detail": {"referenceType": ["tag"], "repositoryName": ["aws-cli-workshop"]}}
+      Targets:
+        - Id: cli-wizard-0
+          Arn: arn:aws:codebuild:us-west-2:123456789012:project/aws-cli-workshop
+          RoleArn: arn:aws:iam::123456789012:role/StartCodeBuildFromEventsRole
+

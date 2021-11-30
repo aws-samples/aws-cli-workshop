@@ -118,3 +118,32 @@ Resources:
             Effect: Allow
             Action: codebuild:StartBuild
             Resource: !GetAtt CodeBuildProject.Arn
+
+  StartCodeBuildFromEventsRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: StartCodeBuildFromEventsRole
+      Description: Role to start build of CodeBuild project from EventBridge
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+            Sid: ''
+      ManagedPolicyArns:
+        - !Ref StartCodeBuildPolicy
+
+  StartCodeBuildOnGitTag:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: StartCodeBuildOnGitTag
+      Description: Starts CodeBuild project on Git tag pushes
+      EventPattern: {"detail-type": ["CodeCommit Repository State Change"], "source": ["aws.codecommit"], "detail": {"referenceType": ["tag"], "repositoryName": [{"Ref": "CodeCommitRepo"}]}}
+      Targets:
+        - Id: cli-wizard-0
+          Arn: !GetAtt CodeBuildProject.Arn
+          RoleArn: !GetAtt StartCodeBuildFromEventsRole.Arn

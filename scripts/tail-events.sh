@@ -109,15 +109,19 @@ create() {
 }
 
 create_log_events_rule() {
-  # COMPLETE THIS: This function should create the EventBridge rule, add the
-  # CloudWatch Logs policy to write events to the CloudWatch Logs group, and
-  # add a target to the CloudWatch Logs group
-  #
-  # HINTS: For implementing this function, you will want to:
-  # * Copy over the contents from the assets/new-rule-commands.sh wizard snippet
-  # * Replace parameter vaules from the wizard snippet using the EVENT_RULE_NAME,
-  #   EVENT_PATTERN, GROUP_ARN global variables to generalize the function
-  >&2 echo "ERROR: You need to complete function: create_log_events_rule" && exit 1
+  aws events put-rule \
+    --name "$EVENT_RULE_NAME" \
+    --description 'Logs EventBridge events to CloudWatch Logs' \
+    --event-pattern "$EVENT_PATTERN" \
+    --query RuleArn --output text
+
+  aws logs put-resource-policy \
+    --policy-name 'WriteEventLogs' \
+    --policy-document "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"TrustEventsToStoreLogEvent\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"delivery.logs.amazonaws.com\",\"events.amazonaws.com\"]},\"Action\":[\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"Resource\":\"$GROUP_ARN:*\"}]}"
+
+  aws events put-targets \
+    --rule "$EVENT_RULE_NAME" \
+    --targets "Id=cli-wizard-0,Arn=$GROUP_ARN"
 }
 
 cleanup() {

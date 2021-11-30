@@ -30,16 +30,13 @@ parse_commandline() {
 
 
 start_codebuild() {
-  # TODO: Implement call to aws codebuild start-build
-  # build_id=$(aws codebuild start-build ... )
+  build_id=$(aws codebuild start-build --project-name "$PROJECT_NAME" $EXTRA_START_ARGS --query build.id --output text)
   echo "Started build: $build_id"
 }
 
 wait_for_build_phase() {
   expected_status="$1"
-  # TODO: Implement the call to batch-get-builds and extract the currentPhase
-  #       value from the output using `--query`
-  until [ $(aws codebuild batch-get-builds ...) == "$expected_status" ]
+  until [ $(aws codebuild batch-get-builds --ids "$build_id" --query builds[].currentPhase --output text) == "$expected_status" ]
   do
     sleep 1
   done

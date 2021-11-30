@@ -1,0 +1,19 @@
+Resources:
+  StartCodeBuildFromEventsRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: StartCodeBuildFromEventsRole
+      Description: Role to start build of CodeBuild project from EventBridge
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+            Sid: ''
+      ManagedPolicyArns:
+        - arn:aws:iam::123456789012:policy/AWSCLIWorkshop-StartBuild
+

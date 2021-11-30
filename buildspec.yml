@@ -4,4 +4,7 @@ phases:
     commands:
       - codebuild-breakpoint
       - echo "Running commands for build id ${CODEBUILD_BUILD_ID}"
-      - echo "hello world"
+      - echo "Building image for ${ECR_REPO_URI}"
+      - ./scripts/build-image-tags.sh "${ECR_REPO_URI}"
+      - aws ecr get-login-password | docker login --username AWS --password-stdin "${ECR_REPO_URI}"
+      - docker push --all-tags "${ECR_REPO_URI}"
