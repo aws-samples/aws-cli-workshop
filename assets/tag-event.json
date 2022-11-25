@@ -1,8 +1,0 @@
-{
-    "detail-type": ["CodeCommit Repository State Change"],
-    "source": ["aws.codecommit"],
-    "detail": {
-        "referenceType": ["tag"],
-        "repositoryName": ["aws-cli-workshop"]
-    }
-}

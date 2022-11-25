@@ -1,0 +1,69 @@
+Parameters:
+  App:
+    Type: String
+    Description: Your application's name.
+  Env:
+    Type: String
+    Description: The environment name your service, job, or workflow is being deployed to.
+  Name:
+    Type: String
+    Description: The name of the service, job, or workflow being deployed.
+Resources:
+  apptable:
+    Metadata:
+      'aws:copilot:description': 'An Amazon DynamoDB table for apptable'
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${App}-${Env}-${Name}-apptable
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: "S"
+        - AttributeName: SK
+          AttributeType: "S"
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+
+  apptableAccessPolicy:
+    Metadata:
+      'aws:copilot:description': 'An IAM ManagedPolicy for your service to access the apptable db'
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: !Sub
+        - Grants CRUD access to the Dynamo DB table ${Table}
+        - { Table: !Ref apptable }
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DDBActions
+            Effect: Allow
+            Action:
+              - dynamodb:BatchGet*
+              - dynamodb:DescribeStream
+              - dynamodb:DescribeTable
+              - dynamodb:Get*
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:BatchWrite*
+              - dynamodb:Create*
+              - dynamodb:Delete*
+              - dynamodb:Update*
+              - dynamodb:PutItem
+            Resource: !Sub ${ apptable.Arn}
+          - Sid: DDBLSIActions
+            Action:
+              - dynamodb:Query
+              - dynamodb:Scan
+            Effect: Allow
+            Resource: !Sub ${ apptable.Arn}/index/*
+
+Outputs:
+  apptableName:
+    Description: "The name of this DynamoDB."
+    Value: !Ref apptable
+#  apptableAccessPolicy:
+#    Description: "The IAM::ManagedPolicy to attach to the task role."
+#    Value: !Ref apptableAccessPolicy

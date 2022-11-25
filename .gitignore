@@ -1,0 +1,5 @@
+# Python compilation
+*.py[cod]
+__pycache__/
+*.so
+sdkconfig/shared-cfg-demo/target

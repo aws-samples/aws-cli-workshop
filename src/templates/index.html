@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/table.html' import render_table %}
+
+{% block content %}
+    <h1>Reviews</h1>
+    <a class="btn btn-primary" href="{{ url_for('review') }}" role="button">Create Review</a>
+{{ render_table(reviews, [('name', 'Product'), ('rating', 'Rating'), ('review', 'Review')]) }}
+{% endblock %}
